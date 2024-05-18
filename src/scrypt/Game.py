@@ -1,5 +1,7 @@
-import pygame
+import pygame, time, random
 from Background import Background
+from Player import Player
+from Hazard import Hazard
 
 class Game:
     screen = None
@@ -8,6 +10,15 @@ class Game:
     height = 600
     run = True
     background = None
+    player = None
+    hazard = []
+    render_text_bateulateral = None
+    render_text_perdeu = None
+
+    #movimento do player
+    RIGHT = pygame.K_RIGHT
+    LEFT = pygame.K_LEFT
+    mudar_x = 0.0
 
     def __init__(self, size, fullscreen):
 
@@ -19,6 +30,13 @@ class Game:
         #pygame.mouse.set_visible(0) # desabilita o mouse
         pygame.display.set_caption('Fuga Espacial')
 
+        #define as fontes
+        my_font = pygame.font.Font("../Fonts/Fonte4.ttf", 100)
+
+        # Mensagens para o jogador
+        self.render_text_bateulateral = my_font.render("VOCÊ BATEU!", 0, (255, 255, 255))
+        self.render_text_perdeu = my_font.render("GAME OVER!", 0, (255, 0, 0))
+
 
     def handle_events(self):
         # Trata o evento e toma a ação necessária.
@@ -27,6 +45,21 @@ class Game:
             if event.type == pygame.QUIT:
                 self.run = False
 
+            # se clicar em qualquer tecla, entra no if
+            if event.type == pygame.KEYDOWN: 
+
+                #se clicar na seta da esquerda, anda 3 para a esquerda no eixo x
+                if event.key == self.LEFT:
+                    self.mudar_x = -3
+            
+                #se clicar na seta da direita, anda 3 para a direita no eixo x
+                if event.key == self.RIGHT:
+                    self.mudar_x = 3
+
+            # se soltar qualquer tecla, não faz nada
+            if event.type == pygame.KEYUP:
+                if event.key == self.LEFT or event.key == self.RIGHT:
+                    self.mudar_x = 0
 
     def elements_update(self, dt):
         self.background.update(dt) # atualiza os elementos
@@ -40,6 +73,22 @@ class Game:
 
         #Variável para movimento de plano de fundo/background
         valocidade_background = 5
+        velocidade_hazard = 10
+
+        hzrd = 0
+        h_x = random.randrange(125, 660)
+        h_y = -550
+
+        # Info Hazard
+        h_width = 100
+        h_height = 110
+
+        #Criar os Hazards
+        self.hazard.append(Hazard("../images/satelite.png", h_x, h_y))
+        self.hazard.append(Hazard("../images/nave.png", h_x, h_y))
+        self.hazard.append(Hazard("../images/cometaVermelho.png", h_x, h_y))
+        self.hazard.append(Hazard("../images/meteoros.png", h_x, h_y))
+        self.hazard.append(Hazard("../images/buracoNegro.png", h_x, h_y))
 
         #movimento da margem esquerda
         movL_x = 0 
@@ -50,6 +99,13 @@ class Game:
         movR_y = 0
 
         self.background = Background() #Criar objeto backgroud
+
+        #Posição do Player
+        x = (self.width - 56) / 2
+        y = self.height - 125
+
+        #Criar o player
+        self.player = Player(x, y)
 
         clock = pygame.time.Clock()
         dt = 16
@@ -71,6 +127,32 @@ class Game:
                 movL_y -= 600
                 movR_y -= 600
 
+            # Movimentação do Player
+            #Altera a coordenada x da nave de acordo com as mudanças no event_handle() para ela se mover
+            x = x + self.mudar_x
+
+            #Desenha o Player    
+            self.player.draw(self.screen, x, y)
+
+            # Restrições do movimento do Player
+            # Se o Player bate na lateral não é Game Over
+            if x > 760 - 92 or x < 40 + 5:
+                self.screen.blit(self.render_text_bateulateral, (80, 200))
+                pygame.display.update() # atualizar a tela
+                time.sleep(3)
+                self.loop()
+                self.run = False
+
+            # adicionando movimento ao hazard
+            h_y = h_y + velocidade_hazard / 4
+            self.hazard[hzrd].draw(self.screen, h_x, h_y)
+            h_y = h_y + velocidade_hazard
+
+            # definindo onde o harzard vai aparecer, recomeçando a posição do obstaculo e da faixa
+            if h_y > self.height:
+                h_y = 0 - h_height
+                h_x = random.randrange(125, 650 - h_height)
+                hzrd = random.randint(0, 4 )
             
             self.handle_events() # trata os eventos
 
