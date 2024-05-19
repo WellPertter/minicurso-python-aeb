@@ -1,4 +1,4 @@
-import pygame, time, random
+import pygame, time, random, os
 from Background import Background
 from Player import Player
 from Hazard import Hazard
@@ -71,6 +71,9 @@ class Game:
     def loop(self):
         # Laço principal 
 
+        score = 0
+        h_passou = 0
+
         #Variável para movimento de plano de fundo/background
         valocidade_background = 5
         velocidade_hazard = 10
@@ -99,6 +102,9 @@ class Game:
         movR_y = 0
 
         self.background = Background() #Criar objeto backgroud
+        
+        # Som ( possivelmente está com erro no meu computador - José Arthur)
+        self.play_soundtrack()
 
         #Posição do Player
         x = (self.width - 56) / 2
@@ -134,9 +140,15 @@ class Game:
             #Desenha o Player    
             self.player.draw(self.screen, x, y)
 
+            # Mostrar Score
+            self.score_card(self.screen, h_passou, score)
+
             # Restrições do movimento do Player
             # Se o Player bate na lateral não é Game Over
             if x > 760 - 92 or x < 40 + 5:
+                #som de colisão (computador está com problema no som- josé arthur)
+                self.play_sound("../sound/jump2.wav")
+
                 self.screen.blit(self.render_text_bateulateral, (80, 200))
                 pygame.display.update() # atualizar a tela
                 time.sleep(3)
@@ -153,6 +165,9 @@ class Game:
                 h_y = 0 - h_height
                 h_x = random.randrange(125, 650 - h_height)
                 hzrd = random.randint(0, 4 )
+                # determinando quantos hazard passaram e a pontuação
+                h_passou = h_passou + 1
+                score = h_passou * 10
             
             self.handle_events() # trata os eventos
 
@@ -161,3 +176,33 @@ class Game:
             #Atualizar a tela 
             pygame.display.update()
             clock.tick(2000) 
+    def score_card(self, screen, h_passou, score):
+        font = pygame.font.SysFont(None, 35)
+        passou = font.render("Passou: " + str(h_passou), True, (255, 255, 128))
+        score = font.render("Score: " + str(score), True, (253, 231, 32))
+        screen.blit(passou, (0, 50))
+        screen.blit(score, (0, 100))
+    
+    def play_soundtrack(self):
+        # Inclui trilha sonora
+        if os.path.isfile('../sounds/racetheme.mp3'):
+            pass
+            pygame.mixer.init()
+            pygame.mixer.music.load('../sounds/racetheme.mp3')
+            pygame.mixer.music.set_volume(0.5)
+            pygame.mixer.music.play(loops=-1) # set o loops to -1 to loop the music indefinitely
+        else:
+            print('../sounds/song.wav not found... ignoring', file=sys.stderr)
+
+    def play_sound(self, sound):
+        # som
+        if os.path.isfile(sound):
+            pygame.mixer.music.load(sound)
+            pygame.mixer.music.set_volume(0.5)
+            pygame.mixer.music.play()
+        else:
+            print("Sound file not found.. ignoring", file=sys.stderr)
+        
+
+
+        
