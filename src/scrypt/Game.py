@@ -60,7 +60,7 @@ class Game:
 
             # se soltar qualquer tecla, não faz nada
             if event.type == pygame.KEYUP:
-                if event.key == self.LEFT or event.key == self.RIGHT:
+                if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
                     self.mudar_x = 0
 
     def elements_update(self, dt):
