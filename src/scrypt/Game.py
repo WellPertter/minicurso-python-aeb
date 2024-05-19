@@ -2,6 +2,7 @@ import pygame, time, random, os
 from Background import Background
 from Player import Player
 from Hazard import Hazard
+from Soundtrack import Soundtrack
 
 class Game:
     screen = None
@@ -14,10 +15,11 @@ class Game:
     hazard = []
     render_text_bateulateral = None
     render_text_perdeu = None
+    soundtrack = None
 
     #movimento do player
-    RIGHT = pygame.K_RIGHT
-    LEFT = pygame.K_LEFT
+    #RIGHT = pygame.K_RIGHT
+    #LEFT = pygame.K_LEFT
     mudar_x = 0.0
 
     def __init__(self, size, fullscreen):
@@ -49,11 +51,11 @@ class Game:
             if event.type == pygame.KEYDOWN: 
 
                 #se clicar na seta da esquerda, anda 3 para a esquerda no eixo x
-                if event.key == self.LEFT:
+                if event.key == pygame.K_LEFT:
                     self.mudar_x = -3
-            
+
                 #se clicar na seta da direita, anda 3 para a direita no eixo x
-                if event.key == self.RIGHT:
+                if event.key == pygame.K_RIGHT:
                     self.mudar_x = 3
 
             # se soltar qualquer tecla, não faz nada
@@ -93,6 +95,10 @@ class Game:
         self.hazard.append(Hazard("../images/meteoros.png", h_x, h_y))
         self.hazard.append(Hazard("../images/buracoNegro.png", h_x, h_y))
 
+        # Som ( possivelmente está com erro no meu computador - José Arthur)
+        self.soundtrack = Soundtrack('../sounds/song.wav')
+        self.soundtrack.play()
+
         #movimento da margem esquerda
         movL_x = 0 
         movL_y = 0
@@ -102,9 +108,6 @@ class Game:
         movR_y = 0
 
         self.background = Background() #Criar objeto backgroud
-        
-        # Som ( possivelmente está com erro no meu computador - José Arthur)
-        self.play_soundtrack()
 
         #Posição do Player
         x = (self.width - 56) / 2
@@ -147,7 +150,8 @@ class Game:
             # Se o Player bate na lateral não é Game Over
             if x > 760 - 92 or x < 40 + 5:
                 #som de colisão (computador está com problema no som- josé arthur)
-                self.play_sound("../sound/jump2.wav")
+                self.soundtrack.set("../sound/jump2.wav")
+                self.soundtrack.play_sound()
 
                 self.screen.blit(self.render_text_bateulateral, (80, 200))
                 pygame.display.update() # atualizar a tela
@@ -183,25 +187,8 @@ class Game:
         screen.blit(passou, (0, 50))
         screen.blit(score, (0, 100))
     
-    def play_soundtrack(self):
-        # Inclui trilha sonora
-        if os.path.isfile('../sounds/racetheme.mp3'):
-            pass
-            pygame.mixer.init()
-            pygame.mixer.music.load('../sounds/racetheme.mp3')
-            pygame.mixer.music.set_volume(0.5)
-            pygame.mixer.music.play(loops=-1) # set o loops to -1 to loop the music indefinitely
-        else:
-            print('../sounds/song.wav not found... ignoring', file=sys.stderr)
 
-    def play_sound(self, sound):
-        # som
-        if os.path.isfile(sound):
-            pygame.mixer.music.load(sound)
-            pygame.mixer.music.set_volume(0.5)
-            pygame.mixer.music.play()
-        else:
-            print("Sound file not found.. ignoring", file=sys.stderr)
+
         
 
 
