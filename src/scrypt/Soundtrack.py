@@ -21,7 +21,7 @@ class Soundtrack:
         if os.path.isfile(soundtrack):
             self.soundtrack = soundtrack
         else:
-            print(soundtrack + "not found... ignoring", file=sys.strderr)
+            print(soundtrack + "not found... ignoring")#, file=sys.strderr)
 
     def play_sound(self, sound):
         # som
@@ -31,4 +31,4 @@ class Soundtrack:
             pygame.mixer.music.set_volume(0.5)
             pygame.mixer.music.play()
         else:
-            print(sound + " file not found.. ignoring", file=sys.stderr)
+            print(sound + " file not found.. ignoring")#, file=sys.stderr)

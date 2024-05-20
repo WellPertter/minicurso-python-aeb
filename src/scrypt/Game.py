@@ -150,8 +150,8 @@ class Game:
             # Se o Player bate na lateral não é Game Over
             if x > 760 - 92 or x < 40 + 5:
                 #som de colisão (computador está com problema no som- josé arthur)
-                self.soundtrack.set("../sound/jump2.wav")
-                self.soundtrack.play_sound()
+                self.soundtrack.set("../sounds/jump2.wav")
+                self.soundtrack.play()
 
                 self.screen.blit(self.render_text_bateulateral, (80, 200))
                 pygame.display.update() # atualizar a tela
