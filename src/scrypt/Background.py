@@ -33,6 +33,18 @@ class Background:
         screen.blit(self.image, (0, 0))
         screen.blit(self.margin_left, (0, 0))    # 60 depois da primeira margem
         screen.blit(self.margin_right, (740, 0)) # 60 antes da segunda margem
+
+    #Desenha o background sem as margens
+    def draw_freedom(self, screen):
+        screen.blit(self.image, (0, 0))
+
+
+    # Escrever mensagem
+    def write_message(self,screen, message, R, G, B, x, y):
+        my_font1 = pygame.font.Font('../fonts/fonte4.ttf', 100)
+        # Mensagens para o jogador
+        render_text = my_font1.render(message, False, (R, G, B)) # (texto, opaco, cor)
+        screen.blit(render_text, (x, y))
     
     def move(self, screen, scr_height, movL_x, movL_y, movR_x, movR_y):
         for i in range(0, 2):

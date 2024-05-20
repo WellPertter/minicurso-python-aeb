@@ -52,11 +52,11 @@ class Game:
 
                 #se clicar na seta da esquerda, anda 3 para a esquerda no eixo x
                 if event.key == pygame.K_LEFT:
-                    self.mudar_x = -3
+                    self.mudar_x = -5
 
                 #se clicar na seta da direita, anda 3 para a direita no eixo x
                 if event.key == pygame.K_RIGHT:
-                    self.mudar_x = 3
+                    self.mudar_x = 5
 
             # se soltar qualquer tecla, não faz nada
             if event.type == pygame.KEYUP:
@@ -173,6 +173,49 @@ class Game:
                 h_passou = h_passou + 1
                 score = h_passou * 10
             
+            #Aumenta a velocidade se score = 60
+            if score == 60:
+                velocidade_hazard += 0.1
+            
+
+            # Colisão do game over
+            player_rect = self.player.image.get_rect()
+            player_rect.topleft = (x, y)
+            hazard_rect = self.hazard[hzrd].image.get_rect()
+            hazard_rect.topleft = (h_x, h_y)
+
+            if hazard_rect.colliderect(player_rect):
+                # Emite som de colisão 
+                self.soundtrack.set("../sounds/crash.wav")
+                self.soundtrack.play()
+                
+                # Exibe a imagem da explosão
+                self.draw_explosion(self.screen, x - (self.player.image.get_width() / 2 ),
+                                    y - (self.player.image.get_height() / 2))
+
+                # Exibe mensagem de Game over
+                self.screen.blit(self.render_text_perdeu, (80, 200))
+                pygame.display.update()
+                time.sleep(3)
+                self.run = False
+            
+            # Vitória do jogador
+            if score == 100:
+                # Música de vitória 
+                self.soundtrack.set("../sounds/racetheme.mp3")
+                self.soundtrack.play()
+
+                # Desenha área diplomática
+                self.background.draw_freedom(self.screen)
+
+                # Escrever mensagens de vitória
+                self.background.write_message(self.screen, str(score) +' PONTOS', 255, 117, 24, 90, 100) # Laranja
+                self.background.write_message(self.screen, 'VOCÊ VENCEU!', 255, 117, 24, 2, 300)  # Laranja 
+
+                pygame.display.update()
+                time.sleep(25)
+                self.run = False
+
             self.handle_events() # trata os eventos
 
             self.elements_update(dt) #atualizar os elementos
@@ -180,6 +223,7 @@ class Game:
             #Atualizar a tela 
             pygame.display.update()
             clock.tick(2000) 
+
     def score_card(self, screen, h_passou, score):
         font = pygame.font.SysFont(None, 35)
         passou = font.render("Passou: " + str(h_passou), True, (255, 255, 128))
@@ -187,6 +231,11 @@ class Game:
         screen.blit(passou, (0, 50))
         screen.blit(score, (0, 100))
     
+    def draw_explosion(self, screen, x, y):
+        explosion_fig = pygame.image.load("../images/explosion.png")
+        explosion_fig.convert()
+        explosion_fig = pygame.transform.scale(explosion_fig, (150, 150))
+        screen.blit(explosion_fig, (x, y))
 
 
         
